@@ -12,8 +12,15 @@ export default function App() {
       <StatusBar barStyle={Appearance.getColorScheme() == "dark" ? "dark-content" : "light-content"} />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Group>
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="CoinSelect" component={CoinSelect} />
+          <Stack.Screen
+            name="Home"
+            component={Home}
+          />
+          <Stack.Screen
+            name="CoinSelect"
+            component={CoinSelect}
+            options={{ headerShown: true }}
+          />
         </Stack.Group>
         <Stack.Group screenOptions={{ presentation: 'modal' }}>
           <Stack.Screen

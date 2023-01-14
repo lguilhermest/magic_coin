@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
 import { Animated, PanResponder, useWindowDimensions } from "react-native";
+import Coins from "../helpers/Coins";
 
 export default function AnimatedCoin({
+  image = {},
   refValue,
   onTouchBorders,
   size = 180
@@ -39,7 +41,7 @@ export default function AnimatedCoin({
 
   return (
     <Animated.Image
-      source={require("../../assets/moeda.png")}
+      source={Coins[image?.image ?? "br_real"][image?.side ?? "front"]}
       resizeMode={'contain'}
       {...panResponder.panHandlers}
       style={[

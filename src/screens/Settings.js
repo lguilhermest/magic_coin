@@ -4,7 +4,7 @@ import { ModalScreen } from "../components";
 import * as ImagePicker from 'expo-image-picker';
 import { StorageService } from "../services";
 
-export default function Settings({ navigation, route }) {
+export default function Settings({ navigation }) {
   async function pickImage() {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -31,7 +31,7 @@ export default function Settings({ navigation, route }) {
     >
       <Button
         label={"Moeda"}
-        onPress={() => navigation.navigate("CoinSelect")}
+        onPress={() => navigation.replace("CoinSelect")}
       />
       <Button
         label={"Imagem de fundo"}

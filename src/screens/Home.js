@@ -7,7 +7,6 @@ import {
   ImageBackground,
 } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
-import * as ImagePicker from 'expo-image-picker';
 import { StorageService } from '../services';
 import AnimatedCoin from '../components/AnimatedCoin';
 import { useIsFocused } from '@react-navigation/native';
@@ -18,6 +17,7 @@ export default function Home({ navigation }) {
   let pan;
   const isFocused = useIsFocused();
   const [image, setImage] = useState(null);
+  const [coin, setCoin] = useState(null);
   const [show, setShow] = useState(false);
   const window = useWindowDimensions();
 
@@ -63,21 +63,22 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     (async () => {
-      const res = await StorageService.getData("background_image");
-      setImage(res)
+      const res_background = await StorageService.getData("background_image");
+      setImage(res_background);
+      const res_coin = await StorageService.getObject("coin_image");
+      setCoin(res_coin)
     })()
   }, [isFocused])
 
   return (
     <TouchableWithoutFeedback
-      onLongPress={() => navigation.navigate("Settings", {
-        onBackgroundChange: (uri) => setImage(uri)
-      })}>
+      onLongPress={() => navigation.navigate("Settings")}>
       <ImageBackground
         source={{ uri: image }}
         style={styles.container}
       >
         <AnimatedCoin
+          image={coin}
           refValue={(ref) => pan = ref}
           size={SIZE}
           onTouchBorders={onTouchBorders}
