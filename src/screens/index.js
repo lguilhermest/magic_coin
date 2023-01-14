@@ -1,5 +1,9 @@
-import HomeScreen from "./HomeScreen";
+import CoinSelect from "./CoinSelect";
+import Home from "./Home";
+import Settings from "./Settings";
 
 export {
-  HomeScreen
+  CoinSelect,
+  Home,
+  Settings
 }

@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import {
   Animated,
-  PanResponder,
   StyleSheet,
   useWindowDimensions,
   TouchableWithoutFeedback,
   ImageBackground,
-  StatusBar,
-  Appearance,
 } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 import * as ImagePicker from 'expo-image-picker';
 import { StorageService } from '../services';
 import AnimatedCoin from '../components/AnimatedCoin';
+import { useIsFocused } from '@react-navigation/native';
 
 const SIZE = 180;
 
-export default function HomeScreen() {
-  let pan
+export default function Home({ navigation }) {
+  let pan;
+  const isFocused = useIsFocused();
   const [image, setImage] = useState(null);
   const [show, setShow] = useState(false);
   const window = useWindowDimensions();
@@ -62,31 +61,18 @@ export default function HomeScreen() {
     }).start();
   }
 
-  const pickImage = () => {
-    ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-    })
-      .then((result) => {
-        StorageService.storeData("background_image", result.assets[0].uri)
-        setImage(result.assets[0].uri);
-      })
-      .catch(() => {
-
-      })
-  };
-
   useEffect(() => {
     (async () => {
       const res = await StorageService.getData("background_image");
       setImage(res)
     })()
-  }, [])
+  }, [isFocused])
 
   return (
-    <TouchableWithoutFeedback onLongPress={() => pickImage()}>
+    <TouchableWithoutFeedback
+      onLongPress={() => navigation.navigate("Settings", {
+        onBackgroundChange: (uri) => setImage(uri)
+      })}>
       <ImageBackground
         source={{ uri: image }}
         style={styles.container}
