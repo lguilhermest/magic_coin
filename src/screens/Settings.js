@@ -4,7 +4,8 @@ import { ModalScreen } from "../components";
 import * as ImagePicker from 'expo-image-picker';
 import { StorageService } from "../services";
 
-export default function Settings({ navigation }) {
+export default function Settings({ navigation, route }) {
+  const { current } = route.params ?? { current: null }
   async function pickImage() {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -18,8 +19,11 @@ export default function Settings({ navigation }) {
     } catch (error) { }
   };
 
-  const Button = ({ label, onPress }) => (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+  const Button = ({ label, onPress, hidden = false }) => (
+    <TouchableOpacity
+      style={[styles.button, hidden && { display: "none" }]}
+      onPress={onPress}
+    >
       <Text style={styles.label}>{label}</Text>
     </TouchableOpacity>
   )
@@ -36,6 +40,22 @@ export default function Settings({ navigation }) {
       <Button
         label={"Imagem de fundo"}
         onPress={pickImage}
+      />
+      <Button
+        hidden={current == "Home"}
+        label={"Home"}
+        onPress={() => {
+          navigation.popToTop();
+          navigation.navigate("Home");
+        }}
+      />
+      <Button
+        hidden={current == "SendCoin"}
+        label={"Send"}
+        onPress={() => {
+          navigation.popToTop();
+          navigation.navigate("SendCoin");
+        }}
       />
     </ModalScreen>
   )

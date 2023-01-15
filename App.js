@@ -1,7 +1,7 @@
 import React from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { CoinSelect, Home, Settings } from "./src/screens";
+import { CoinSelect, Home, SendCoin, Settings } from "./src/screens";
 import { Appearance, StatusBar } from "react-native";
 
 const Stack = createNativeStackNavigator();
@@ -21,6 +21,10 @@ export default function App() {
             component={CoinSelect}
             options={{ headerShown: true }}
           />
+          <Stack.Screen
+            name="SendCoin"
+            component={SendCoin}
+          />
         </Stack.Group>
         <Stack.Group screenOptions={{ presentation: 'modal' }}>
           <Stack.Screen
@@ -28,8 +32,6 @@ export default function App() {
             component={Settings}
             options={{
               presentation: "transparentModal",
-              headerMode: "none",
-              headerRight: null
             }}
           />
         </Stack.Group>

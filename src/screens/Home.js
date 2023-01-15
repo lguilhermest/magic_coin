@@ -5,25 +5,14 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
-import { StorageService } from '../services';
-import { useIsFocused } from '@react-navigation/native';
 import { AnimatedCoin, Container } from '../components';
 
 const SIZE = 180;
 
 export default function Home({ navigation }) {
   const pan = new Animated.ValueXY();
-  const isFocused = useIsFocused();
   const window = useWindowDimensions();
-  const [coin, setCoin] = useState(null);
   const [enableShow, setEnableShow] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      const res_coin = await StorageService.getObject("coin_image");
-      setCoin(res_coin)
-    })()
-  }, [isFocused])
 
   useEffect(() => {
     if (enableShow) {
@@ -62,12 +51,11 @@ export default function Home({ navigation }) {
 
   return (
     <Container
-      onLongPress={() => navigation.navigate("Settings")}
+      onLongPress={() => navigation.navigate("Settings", { current: "Home" })}
       style={styles.container}
     >
       <AnimatedCoin
         animatedValue={pan}
-        image={coin}
         size={SIZE}
         onTouchBordersEnd={() => setEnableShow(true)}
       />

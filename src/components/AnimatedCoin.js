@@ -1,13 +1,10 @@
-import React from "react";
-import { Animated, PanResponder, useWindowDimensions } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Animated, DeviceEventEmitter, PanResponder, useWindowDimensions } from "react-native";
 import Coins from "../helpers/Coins";
+import { StorageService } from "../services";
 
 export default function AnimatedCoin({
   animatedValue = new Animated.ValueXY(),
-  image = {
-    name: null,
-    side: null
-  },
   onTouchBorders = () => null,
   onTouchBordersEnd = () => null,
   hindOnTouchBorders = true,
@@ -15,10 +12,11 @@ export default function AnimatedCoin({
   size = 180,
   throwEffect = false,
 }) {
+  const [image, setImage] = useState({})
   const half_size = size / 2;
   const window = useWindowDimensions();
-  const screenWidth = window.width
-  const screenHeight = window.height
+  const screenWidth = window.width;
+  const screenHeight = window.height;
 
   function keepMovingOnTouchBorders(event, gesture) {
     Animated.decay(animatedValue, {
@@ -33,7 +31,21 @@ export default function AnimatedCoin({
     })
   }
 
+  function stopOnGetOutOfScreen() {
+    animatedValue.addListener((state) => {
+      if (
+        state.x < -(screenWidth / 2 + size) ||
+        state.x > screenWidth / 2 ||
+        state.y < -(screenHeight / 2 + size) ||
+        state.y > screenHeight / 2
+      ) {
+        animatedValue.stopAnimation();
+      }
+    });
+  }
+
   function throwEffectMovement(event, gesture) {
+    stopOnGetOutOfScreen();
     Animated.decay(animatedValue, {
       velocity: {
         x: gesture.vx,
@@ -75,6 +87,17 @@ export default function AnimatedCoin({
   const panStyle = {
     transform: animatedValue.getTranslateTransform(),
   };
+
+  useEffect(() => {
+    const subscriber = DeviceEventEmitter.addListener("coin_image", async () => {
+      const res = await StorageService.getObject("coin_image");
+      setImage(res);
+    })
+
+    DeviceEventEmitter.emit("coin_image", {})
+
+    return () => subscriber.remove();
+  }, []);
 
   return (
     <Animated.Image
