@@ -8,58 +8,18 @@ import {
 } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 import { StorageService } from '../services';
-import AnimatedCoin from '../components/AnimatedCoin';
 import { useIsFocused } from '@react-navigation/native';
+import AnimatedCoin from '../components/AnimatedCoin';
 
 const SIZE = 180;
 
 export default function Home({ navigation }) {
-  let pan;
+  const pan = new Animated.ValueXY();
   const isFocused = useIsFocused();
+  const window = useWindowDimensions();
   const [image, setImage] = useState(null);
   const [coin, setCoin] = useState(null);
-  const [show, setShow] = useState(false);
-  const window = useWindowDimensions();
-
-  useEffect(() => {
-    Accelerometer.setUpdateInterval(1000);
-    Accelerometer.addListener(({ x, y, z }) => {
-      const acceleration = Math.sqrt(x * x + y * y + z * z);
-      const sensibility = 2.5;
-      if (acceleration >= sensibility) {
-        setShow(true);
-      }
-    });
-    return () => Accelerometer.removeAllListeners();
-  }, []);
-
-  useEffect(() => {
-    if (show) {
-      pan.setValue({
-        x: 0,
-        y: -(window.height / 2 + SIZE)
-      });
-      Animated.timing(pan, {
-        toValue: {
-          x: 0,
-          y: 0,
-        },
-        duration: 1000,
-        useNativeDriver: true,
-      }).start(() => setShow(false));
-    }
-  }, [show]);
-
-  function onTouchBorders(value, gesture) {
-    Animated.timing(value, {
-      toValue: {
-        x: gesture.moveX <= (SIZE / 2) ? -SIZE : window.width + SIZE,
-        y: gesture.moveY,
-      },
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }
+  const [enableShow, setEnableShow] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -70,6 +30,54 @@ export default function Home({ navigation }) {
     })()
   }, [isFocused])
 
+  useEffect(() => {
+    if (enableShow) {
+      pan.setValue({
+        x: 0,
+        y: -window.height
+      })
+      Accelerometer.setUpdateInterval(1000);
+      Accelerometer.addListener(({ x, y, z }) => {
+        const acceleration = Math.sqrt(x * x + y * y + z * z);
+        const sensibility = 2.5;
+        if (acceleration >= sensibility) {
+          slideFromTop();
+        }
+      });
+    } else {
+      Accelerometer.removeAllListeners();
+    }
+    return () => Accelerometer.removeAllListeners();
+  }, [enableShow]);
+
+  function onTouchBorders(value, gesture, position) {
+    Animated.timing(value, {
+      toValue: {
+        x: gesture.moveX <= (SIZE / 2) ? -SIZE : window.width + SIZE,
+        y: gesture.moveY,
+      },
+      duration: 1000,
+      useNativeDriver: true,
+    }).start(() => {
+      setEnableShow(true)
+    });
+  }
+
+  function slideFromTop() {
+    setTimeout(() => {
+      Animated.timing(pan, {
+        toValue: {
+          x: 0,
+          y: 0
+        },
+        duration: 1000,
+        useNativeDriver: true,
+      }).start(() => {
+        setEnableShow(false)
+      });
+    })
+  }
+
   return (
     <TouchableWithoutFeedback
       onLongPress={() => navigation.navigate("Settings")}>
@@ -78,8 +86,8 @@ export default function Home({ navigation }) {
         style={styles.container}
       >
         <AnimatedCoin
+          animatedValue={pan}
           image={coin}
-          refValue={(ref) => pan = ref}
           size={SIZE}
           onTouchBorders={onTouchBorders}
         />
@@ -93,7 +101,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
   },
   circle: {
     backgroundColor: 'gray',
