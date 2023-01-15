@@ -31,11 +31,11 @@ export default function CoinSelect({ navigation }) {
       {Object.keys(Coins).map((item, i) =>
         <View key={i} style={styles.row}>
           <CoinButton
-            name={{ image: item, side: "front" }}
+            name={{ name: item, side: "front" }}
             image={Coins[item].front}
           />
           <CoinButton
-            name={{ image: item, side: "back" }}
+            name={{ name: item, side: "back" }}
             image={Coins[item].back}
           />
         </View>

@@ -3,10 +3,15 @@ import { Animated, PanResponder, useWindowDimensions } from "react-native";
 import Coins from "../helpers/Coins";
 
 export default function AnimatedCoin({
-  image = {},
-  onTouchBorders,
-  size = 180,
   animatedValue = new Animated.ValueXY(),
+  image = {
+    name: null,
+    side: null
+  },
+  onTouchBorders = () => null,
+  onThrowEffectEnd = () => null,
+  size = 180,
+  throwEffect = false,
 }) {
   const half_size = size / 2;
   const window = useWindowDimensions();
@@ -21,35 +26,29 @@ export default function AnimatedCoin({
         y: gesture.dy
       })
     },
-    onPanResponderRelease: (_, gesture) => {
+    onPanResponderRelease: (event, gesture) => {
       animatedValue.extractOffset();
-      if (Math.abs(gesture.vx) > 100 || Math.abs(gesture.vy) > 100) {
-        keepMoving({
-          x: gesture.vx / 10,
-          y: gesture.vy / 10
+      if (throwEffect && (Math.abs(gesture.vx) > 100 || Math.abs(gesture.vy) > 100)) {
+        Animated.decay(animatedValue, {
+          velocity: {
+            x: gesture.vx / 10,
+            y: gesture.vy / 10
+          },
+          useNativeDriver: true
+        }).start(() => {
+          animatedValue.extractOffset();
+          onThrowEffectEnd(event, gesture)
         });
-      } else {
-        if (gesture.moveX <= half_size) {
-          onTouchBorders(animatedValue, gesture, "left");
-        } else if (gesture.moveY <= half_size) {
-          onTouchBorders(animatedValue, gesture, "top");
-        } else if (gesture.moveX >= (window.width - half_size)) {
-          onTouchBorders(animatedValue, gesture, "right");
-        } else if (gesture.moveX >= (window.width - half_size)) {
-          onTouchBorders(animatedValue, gesture, "bottom");
-        }
+      } else if (
+        gesture.moveX <= half_size ||
+        gesture.moveY <= half_size ||
+        gesture.moveX >= (window.width - half_size) ||
+        gesture.moveY >= (window.height - half_size)
+      ) {
+        onTouchBorders(animatedValue, gesture);
       }
     },
   });
-
-  const keepMoving = (velocity) => {
-    Animated.decay(animatedValue, {
-      velocity,
-      useNativeDriver: true
-    }).start(() => {
-      animatedValue.extractOffset();
-    });
-  }
 
   const panStyle = {
     transform: animatedValue.getTranslateTransform(),
@@ -57,7 +56,7 @@ export default function AnimatedCoin({
 
   return (
     <Animated.Image
-      source={Coins[image?.image ?? "br_real"][image?.side ?? "front"]}
+      source={Coins[image?.name ?? "br_real"][image?.side ?? "front"]}
       resizeMode={'contain'}
       {...panResponder.panHandlers}
       style={[
