@@ -9,6 +9,8 @@ export default function AnimatedCoin({
     side: null
   },
   onTouchBorders = () => null,
+  onTouchBordersEnd = () => null,
+  hindOnTouchBorders = true,
   onThrowEffectEnd = () => null,
   size = 180,
   throwEffect = false,
@@ -17,6 +19,32 @@ export default function AnimatedCoin({
   const window = useWindowDimensions();
   const screenWidth = window.width
   const screenHeight = window.height
+
+  function keepMovingOnTouchBorders(event, gesture) {
+    Animated.decay(animatedValue, {
+      velocity: {
+        x: gesture.vx,
+        y: gesture.vy
+      },
+      deceleration: 0.997,
+      useNativeDriver: true
+    }).start(() => {
+      onTouchBordersEnd()
+    })
+  }
+
+  function throwEffectMovement(event, gesture) {
+    Animated.decay(animatedValue, {
+      velocity: {
+        x: gesture.vx,
+        y: gesture.vy
+      },
+      useNativeDriver: true
+    }).start(() => {
+      animatedValue.extractOffset();
+      onThrowEffectEnd(event, gesture)
+    });
+  }
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -29,22 +57,16 @@ export default function AnimatedCoin({
     onPanResponderRelease: (event, gesture) => {
       animatedValue.extractOffset();
       if (throwEffect && (Math.abs(gesture.vx) > 100 || Math.abs(gesture.vy) > 100)) {
-        Animated.decay(animatedValue, {
-          velocity: {
-            x: gesture.vx / 10,
-            y: gesture.vy / 10
-          },
-          useNativeDriver: true
-        }).start(() => {
-          animatedValue.extractOffset();
-          onThrowEffectEnd(event, gesture)
-        });
+        throwEffectMovement(event, gesture);
       } else if (
         gesture.moveX <= half_size ||
         gesture.moveY <= half_size ||
         gesture.moveX >= (window.width - half_size) ||
         gesture.moveY >= (window.height - half_size)
       ) {
+        if (hindOnTouchBorders) {
+          keepMovingOnTouchBorders(event, gesture);
+        }
         onTouchBorders(animatedValue, gesture);
       }
     },
