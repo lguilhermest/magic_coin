@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Animated, DeviceEventEmitter, PanResponder, useWindowDimensions } from "react-native";
-import Coins from "../helpers/Coins";
 import { StorageService } from "../services";
+import Coins from "../helpers/Coins";
 
 export default function AnimatedCoin({
   animatedValue = new Animated.ValueXY(),
+  customImage,
   onTouchBorders = () => null,
   onTouchBordersEnd = () => null,
   hindOnTouchBorders = true,
@@ -12,23 +13,23 @@ export default function AnimatedCoin({
   size = 180,
   throwEffect = false,
 }) {
-  const [image, setImage] = useState({})
+  const [image, setImage] = useState(customImage ?? {})
   const half_size = size / 2;
   const window = useWindowDimensions();
   const screenWidth = window.width;
   const screenHeight = window.height;
 
-  function keepMovingOnTouchBorders(event, gesture) {
+  useEffect(() => {
+    if (customImage) {
+      setImage(customImage)
+    }
+  }, [customImage])
+
+  function keepMoving(velocity, callback) {
     Animated.decay(animatedValue, {
-      velocity: {
-        x: gesture.vx,
-        y: gesture.vy
-      },
-      deceleration: 0.997,
+      velocity: velocity,
       useNativeDriver: true
-    }).start(() => {
-      onTouchBordersEnd()
-    })
+    }).start(callback());
   }
 
   function stopOnGetOutOfScreen() {
@@ -44,20 +45,6 @@ export default function AnimatedCoin({
     });
   }
 
-  function throwEffectMovement(event, gesture) {
-    stopOnGetOutOfScreen();
-    Animated.decay(animatedValue, {
-      velocity: {
-        x: gesture.vx,
-        y: gesture.vy
-      },
-      useNativeDriver: true
-    }).start(() => {
-      animatedValue.extractOffset();
-      onThrowEffectEnd(event, gesture)
-    });
-  }
-
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (event, gesture) => {
@@ -68,8 +55,12 @@ export default function AnimatedCoin({
     },
     onPanResponderRelease: (event, gesture) => {
       animatedValue.extractOffset();
-      if (throwEffect && (Math.abs(gesture.vx) > 100 || Math.abs(gesture.vy) > 100)) {
-        throwEffectMovement(event, gesture);
+      if (throwEffect && (Math.abs(gesture.vx) > 1 || Math.abs(gesture.vy) > 1)) {
+        stopOnGetOutOfScreen();
+        keepMoving({ x: gesture.vx, y: gesture.vy }, () => {
+          animatedValue.extractOffset();
+          onThrowEffectEnd({ event, gesture, image })
+        })
       } else if (
         gesture.moveX <= half_size ||
         gesture.moveY <= half_size ||
@@ -77,7 +68,9 @@ export default function AnimatedCoin({
         gesture.moveY >= (window.height - half_size)
       ) {
         if (hindOnTouchBorders) {
-          keepMovingOnTouchBorders(event, gesture);
+          keepMoving({ x: gesture.vx, y: gesture.vy }, () => {
+            onTouchBordersEnd()
+          })
         }
         onTouchBorders(animatedValue, gesture);
       }

@@ -42,6 +42,22 @@ export default function Settings({ navigation, route }) {
         onPress={pickImage}
       />
       <Button
+        hidden={current == "SendCoin"}
+        label={"Sender"}
+        onPress={() => {
+          navigation.popToTop();
+          navigation.navigate("SendCoin");
+        }}
+      />
+      <Button
+        hidden={current == "ReceiveCoin"}
+        label={"Receiver"}
+        onPress={() => {
+          navigation.popToTop();
+          navigation.navigate("ReceiveCoin");
+        }}
+      />
+      <Button
         hidden={current == "Home"}
         label={"Home"}
         onPress={() => {

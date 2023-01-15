@@ -8,25 +8,30 @@ import AnimatedCoin from '../components/AnimatedCoin';
 import { Container } from '../components';
 import { setDoc, doc, onSnapshot } from "firebase/firestore";
 import { firestore } from '../services/Firebase';
-import { StorageService } from '../services';
 
 const SIZE = 180;
 
-export default function SendCoin({ navigation }) {
+export default function ReceiveCoin({ navigation }) {
   const pan = new Animated.ValueXY();
   const window = useWindowDimensions();
-  const [show, setShow] = useState();
+  const [image, setImage] = useState()
 
   useEffect(() => {
-    resetData();
     const unsub = onSnapshot(doc(firestore, "devices", "test_device"), (doc) => {
       const response = doc.data()
-      if (response?.side == "sender") {
-        setShow(true);
+      if (response?.side == "receiver") {
+        setImage(response.image)
       }
     });
 
     return () => unsub();
+  }, [])
+
+  useEffect(() => {
+    pan.setValue({
+      x: 0,
+      y: -window.height
+    });
   }, [])
 
   function slideFromTop() {
@@ -43,38 +48,32 @@ export default function SendCoin({ navigation }) {
         duration: 1000,
         useNativeDriver: true,
       }).start(() => {
-        setShow(false);
+        setImage(null)
       });
     })
   }
 
   useEffect(() => {
-    if (show == true) {
+    if (!!image) {
       slideFromTop()
     }
-  }, [show])
+  }, [image])
 
-  async function onThrowEffectEnd({ image }) {
+  async function onThrowEffectEnd() {
     try {
       await setDoc(doc(firestore, "devices", "test_device"), {
-        side: "receiver",
-        image
+        side: "sender",
       });
     } catch (e) { }
   }
 
-  async function resetData() {
-    await setDoc(doc(firestore, "devices", "test_device"), {
-      side: null
-    });
-  }
-
   return (
     <Container
-      onLongPress={() => navigation.navigate("Settings", { current: "SendCoin" })}
+      onLongPress={() => navigation.navigate("Settings", { current: "ReceiveCoin" })}
       style={styles.container}
     >
       <AnimatedCoin
+        customImage={image}
         animatedValue={pan}
         hindOnTouchBorders={false}
         size={SIZE}
