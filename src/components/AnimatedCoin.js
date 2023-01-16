@@ -26,6 +26,7 @@ export default function AnimatedCoin({
   }, [customImage])
 
   function keepMoving(velocity, callback) {
+    stopOnGetOutOfScreen();
     Animated.decay(animatedValue, {
       velocity: velocity,
       useNativeDriver: true,
@@ -57,7 +58,6 @@ export default function AnimatedCoin({
     onPanResponderRelease: (event, gesture) => {
       animatedValue.extractOffset();
       if (throwEffect && (Math.abs(gesture.vx) > 1 || Math.abs(gesture.vy) > 1)) {
-        stopOnGetOutOfScreen();
         keepMoving({ x: gesture.vx, y: gesture.vy }, () => {
           animatedValue.extractOffset();
           onThrowEffectEnd({ event, gesture, image })

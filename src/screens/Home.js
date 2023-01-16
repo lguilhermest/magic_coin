@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {
   Animated,
+  Pressable,
   StyleSheet,
+  Text,
   useWindowDimensions,
 } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
@@ -20,11 +22,13 @@ export default function Home({ navigation }) {
         x: 0,
         y: -window.height
       })
+      let enabled = true
       Accelerometer.setUpdateInterval(1000);
       Accelerometer.addListener(({ x, y, z }) => {
         const acceleration = Math.sqrt(x * x + y * y + z * z);
         const sensibility = 2.5;
-        if (acceleration >= sensibility) {
+        if (acceleration >= sensibility && enabled) {
+          enabled = false;
           slideFromTop();
         }
       });
@@ -35,18 +39,16 @@ export default function Home({ navigation }) {
   }, [enableShow]);
 
   function slideFromTop() {
-    setTimeout(() => {
-      Animated.timing(pan, {
-        toValue: {
-          x: 0,
-          y: 0
-        },
-        duration: 1000,
-        useNativeDriver: true,
-      }).start(() => {
-        setEnableShow(false)
-      });
-    })
+    Animated.timing(pan, {
+      toValue: {
+        x: 0,
+        y: 0
+      },
+      duration: 500,
+      useNativeDriver: true,
+    }).start(() => {
+      setEnableShow(false)
+    });
   }
 
   return (
