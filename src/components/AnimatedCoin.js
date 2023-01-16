@@ -28,8 +28,9 @@ export default function AnimatedCoin({
   function keepMoving(velocity, callback) {
     Animated.decay(animatedValue, {
       velocity: velocity,
-      useNativeDriver: true
-    }).start(callback());
+      useNativeDriver: true,
+      isInteraction: false
+    }).start(callback);
   }
 
   function stopOnGetOutOfScreen() {

@@ -1,8 +1,8 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { ModalScreen } from "../components";
+import { ModalScreen } from "../../components";
 import * as ImagePicker from 'expo-image-picker';
-import { StorageService } from "../services";
+import { StorageService } from "../../services";
 
 export default function Settings({ navigation, route }) {
   const { current } = route.params ?? { current: null }
@@ -42,6 +42,18 @@ export default function Settings({ navigation, route }) {
         onPress={pickImage}
       />
       <Button
+        label={"Tela inicial"}
+        onPress={() => navigation.replace("ScreenSelect")}
+      />
+      <Button
+        hidden={current == "Home"}
+        label={"Home"}
+        onPress={() => {
+          navigation.popToTop();
+          navigation.navigate("Home");
+        }}
+      />
+      <Button
         hidden={current == "SendCoin"}
         label={"Sender"}
         onPress={() => {
@@ -55,22 +67,6 @@ export default function Settings({ navigation, route }) {
         onPress={() => {
           navigation.popToTop();
           navigation.navigate("ReceiveCoin");
-        }}
-      />
-      <Button
-        hidden={current == "Home"}
-        label={"Home"}
-        onPress={() => {
-          navigation.popToTop();
-          navigation.navigate("Home");
-        }}
-      />
-      <Button
-        hidden={current == "SendCoin"}
-        label={"Send"}
-        onPress={() => {
-          navigation.popToTop();
-          navigation.navigate("SendCoin");
         }}
       />
     </ModalScreen>
