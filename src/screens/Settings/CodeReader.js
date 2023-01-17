@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { StorageService } from "../services";
+import { StorageService } from "../../services";
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Alert, StyleSheet, Text, View } from "react-native";
-import { ModalScreen } from "../components";
+import { ModalScreen } from "../../components";
 
 export default function CodeReader({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);

@@ -1,7 +1,7 @@
 import React from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
-import { StorageService } from "../services";
-import Coins from "../helpers/Coins";
+import { StorageService } from "../../services";
+import Coins from "../../helpers/Coins";
 
 export default function CoinSelect({ navigation }) {
   async function onSelect(obj) {

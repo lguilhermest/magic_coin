@@ -4,11 +4,11 @@ import {
   StyleSheet,
   useWindowDimensions
 } from 'react-native';
-import AnimatedCoin from '../components/AnimatedCoin';
-import { Container } from '../components';
+import AnimatedCoin from '../../components/AnimatedCoin';
+import { Container } from '../../components';
 import { setDoc, doc, onSnapshot } from "firebase/firestore";
-import { firestore } from '../services/Firebase';
-import { StorageService } from '../services';
+import { firestore } from '../../services/Firebase';
+import { StorageService } from '../../services';
 
 const SIZE = 180;
 

@@ -6,6 +6,7 @@ import {
   CodeGenerate,
   CodeReader,
   CoinSelect,
+  HideCoin,
   Home,
   ReceiveCoin,
   ScreenSelect,
@@ -51,11 +52,15 @@ export default function App() {
   return (
     <NavigationContainer>
       <StatusBar barStyle={Appearance.getColorScheme() == "dark" ? "dark-content" : "light-content"} />
-      <Stack.Navigator initialRouteName={initialRouteName} screenOptions={{ headerShown: false }}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Group>
           <Stack.Screen
             name="Home"
             component={Home}
+          />
+          <Stack.Screen
+            name="HideCoin"
+            component={HideCoin}
           />
           <Stack.Screen
             name="CoinSelect"

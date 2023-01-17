@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { StorageService } from "../services";
+import { StorageService } from "../../services";
 import QRCode from 'react-native-qrcode-svg';
-import { ModalScreen } from "../components";
+import { ModalScreen } from "../../components";
 import { View } from "react-native";
 
 export default function CodeGenerate({ navigation }) {
