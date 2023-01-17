@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ActivityIndicator, Appearance, StatusBar } from "react-native";
 import {
   CodeGenerate,
+  CodeReader,
   CoinSelect,
   Home,
   ReceiveCoin,
@@ -70,27 +71,22 @@ export default function App() {
             component={SendCoin}
           />
         </Stack.Group>
-        <Stack.Group screenOptions={{ presentation: 'modal' }}>
+        <Stack.Group screenOptions={{ presentation: "transparentModal", }}>
           <Stack.Screen
             name="Settings"
             component={Settings}
-            options={{
-              presentation: "transparentModal",
-            }}
           />
           <Stack.Screen
             name="ScreenSelect"
             component={ScreenSelect}
-            options={{
-              presentation: "transparentModal",
-            }}
           />
           <Stack.Screen
             name="CodeGenerate"
             component={CodeGenerate}
-            options={{
-              presentation: "transparentModal",
-            }}
+          />
+          <Stack.Screen
+            name="CodeReader"
+            component={CodeReader}
           />
         </Stack.Group>
       </Stack.Navigator>

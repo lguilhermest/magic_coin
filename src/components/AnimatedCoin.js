@@ -5,6 +5,7 @@ import Coins from "../helpers/Coins";
 
 export default function AnimatedCoin({
   animatedValue = new Animated.ValueXY(),
+  hidden = false,
   customImage,
   onTouchBorders = () => null,
   onTouchBordersEnd = () => null,
@@ -101,7 +102,7 @@ export default function AnimatedCoin({
       style={[
         {
           position: "absolute",
-          top: screenHeight / 2 - half_size,
+          top: hidden ? -size : screenHeight / 2 - half_size,
           height: size,
           width: size,
           borderRadius: size / 2,

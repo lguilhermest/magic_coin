@@ -1,4 +1,5 @@
 import CodeGenerate from "./CodeGenerate";
+import CodeReader from "./CodeReader";
 import CoinSelect from "./CoinSelect";
 import Home from "./Home";
 import ReceiveCoin from "./ReceiveCoin";
@@ -8,6 +9,7 @@ import ScreenSelect from "./Settings/ScreenSelect";
 
 export {
   CodeGenerate,
+  CodeReader,
   CoinSelect,
   Home,
   ReceiveCoin,

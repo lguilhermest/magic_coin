@@ -8,47 +8,57 @@ import AnimatedCoin from '../components/AnimatedCoin';
 import { Container } from '../components';
 import { setDoc, doc, onSnapshot } from "firebase/firestore";
 import { firestore } from '../services/Firebase';
+import { useIsFocused } from '@react-navigation/native';
+import { StorageService } from '../services';
 
 const SIZE = 180;
 
 export default function ReceiveCoin({ navigation }) {
+  let subscriber = null
   const pan = new Animated.ValueXY();
   const window = useWindowDimensions();
-  const [image, setImage] = useState()
+  const [image, setImage] = useState();
+  const [deviceId, setDeviceId] = useState(null);
+
+  const isFocused = useIsFocused()
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(firestore, "devices", "test_device"), (doc) => {
-      const response = doc.data()
-      if (response?.side == "receiver") {
-        setImage(response.image)
+    initialize();
+    return () => {
+      if (subscriber) {
+        subscriber()
       }
-    });
+    };
+  }, [isFocused])
 
-    return () => unsub();
-  }, [])
-
-  useEffect(() => {
-    pan.setValue({
-      x: 0,
-      y: -window.height
-    });
-  }, [])
+  async function initialize() {
+    try {
+      const device_id = await StorageService.getData("device_connection");
+      if (device_id) {
+        setDeviceId(device_id)
+        subscriber = onSnapshot(doc(firestore, "devices", device_id), (doc) => {
+          const response = doc.data()
+          if (response?.side == "receiver") {
+            setImage(response.image)
+          }
+        });
+      } else {
+        navigation.navigate("CodeReader");
+      }
+    } catch (error) { }
+  }
 
   function slideFromTop() {
-    pan.setValue({
-      x: 0,
-      y: -window.height
-    });
     setTimeout(() => {
       Animated.timing(pan, {
         toValue: {
           x: 0,
-          y: 0
+          y: (window.height / 2) + SIZE / 2
         },
         duration: 1000,
         useNativeDriver: true,
       }).start(() => {
-        setImage(null)
+        pan.extractOffset();
       });
     })
   }
@@ -61,7 +71,7 @@ export default function ReceiveCoin({ navigation }) {
 
   async function onThrowEffectEnd() {
     try {
-      await setDoc(doc(firestore, "devices", "test_device"), {
+      await setDoc(doc(firestore, "devices", deviceId), {
         side: "sender",
       });
     } catch (e) { }
@@ -72,14 +82,17 @@ export default function ReceiveCoin({ navigation }) {
       onLongPress={() => navigation.navigate("Settings", { current: "ReceiveCoin" })}
       style={styles.container}
     >
-      <AnimatedCoin
-        customImage={image}
-        animatedValue={pan}
-        hindOnTouchBorders={false}
-        size={SIZE}
-        throwEffect
-        onThrowEffectEnd={onThrowEffectEnd}
-      />
+      {deviceId &&
+        <AnimatedCoin
+          hidden
+          customImage={image}
+          animatedValue={pan}
+          hindOnTouchBorders={false}
+          size={SIZE}
+          throwEffect
+          onThrowEffectEnd={onThrowEffectEnd}
+        />
+      }
     </Container>
   );
 }

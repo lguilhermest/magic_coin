@@ -10,7 +10,6 @@ export default function CodeGenerate({ navigation }) {
   useEffect(() => {
     (async () => {
       const id = await StorageService.getData("device_id")
-      console.log(id);
       setCode(id)
     })()
   }, [])

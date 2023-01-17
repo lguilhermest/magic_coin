@@ -42,8 +42,14 @@ export default function Settings({ navigation, route }) {
         onPress={pickImage}
       />
       <Button
+        hidden={current != "SendCoin"}
         label={"Share Code"}
         onPress={() => navigation.replace("CodeGenerate")}
+      />
+      <Button
+        hidden={current != "ReceiveCoin"}
+        label={"Read Code"}
+        onPress={() => navigation.replace("CodeReader")}
       />
       <Button
         label={"Tela inicial"}
