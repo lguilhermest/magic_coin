@@ -6,21 +6,29 @@ export default function ModalScreen({
   children,
   containerStyle,
   onBackdropPress,
+  backdrop,
+  centralize,
   useInsets = true,
   style
 }) {
   const safeArea = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View
+      style={[
+        styles.container,
+        containerStyle,
+        centralize && styles.centralize
+      ]}
+    >
       <Pressable
-        style={{ flex: 1 }}
+        style={[styles.backdrop, backdrop && { backgroundColor: "#00000052" }]}
         onPress={onBackdropPress}
       />
       <View
         style={[
           style,
-          useInsets && { paddingBottom: safeArea.bottom + style.padding }
+          useInsets && { paddingBottom: safeArea.bottom + (style?.padding ?? 0) }
         ]}
       >
         {children}
@@ -32,7 +40,14 @@ export default function ModalScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "#00000032",
     justifyContent: "flex-end"
+  },
+  backdrop: {
+    position: "absolute",
+    ...StyleSheet.absoluteFill
+  },
+  centralize: {
+    alignItems: "center",
+    justifyContent: "center"
   }
 })
