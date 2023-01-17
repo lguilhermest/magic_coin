@@ -42,6 +42,10 @@ export default function Settings({ navigation, route }) {
         onPress={pickImage}
       />
       <Button
+        label={"Share Code"}
+        onPress={() => navigation.replace("CodeGenerate")}
+      />
+      <Button
         label={"Tela inicial"}
         onPress={() => navigation.replace("ScreenSelect")}
       />

@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ActivityIndicator, Appearance, StatusBar } from "react-native";
 import {
+  CodeGenerate,
   CoinSelect,
   Home,
   ReceiveCoin,
@@ -11,6 +12,8 @@ import {
   Settings
 } from "./src/screens";
 import { StorageService } from "./src/services";
+import { addDoc, collection } from "firebase/firestore";
+import { firestore } from "./src/services/Firebase";
 
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +30,14 @@ export default function App() {
       const screenName = await StorageService.getData("initial_screen");
       if (screenName) {
         setInitialRouteName(screenName);
+      }
+      const device_id = await StorageService.getData("device_id");
+      if (!device_id) {
+        const { id } = await addDoc(collection(firestore, "devices"), {
+          side: null,
+          image: null
+        });
+        await StorageService.storeData("device_id", id);
       }
     } catch (error) { }
     setLoading(false)
@@ -70,6 +81,13 @@ export default function App() {
           <Stack.Screen
             name="ScreenSelect"
             component={ScreenSelect}
+            options={{
+              presentation: "transparentModal",
+            }}
+          />
+          <Stack.Screen
+            name="CodeGenerate"
+            component={CodeGenerate}
             options={{
               presentation: "transparentModal",
             }}

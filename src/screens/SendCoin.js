@@ -13,21 +13,35 @@ import { StorageService } from '../services';
 const SIZE = 180;
 
 export default function SendCoin({ navigation }) {
+  let subscriber
+  const [deviceId, setDeviceId] = useState(null)
   const pan = new Animated.ValueXY();
   const window = useWindowDimensions();
   const [show, setShow] = useState();
 
   useEffect(() => {
-    resetData();
-    const unsub = onSnapshot(doc(firestore, "devices", "test_device"), (doc) => {
+    initialize();
+
+    return () => {
+      if(subscriber){
+        subscriber()
+      }
+    };
+  }, []);
+
+  async function initialize() {
+    const device_id = await StorageService.getData("device_id");
+    setDeviceId(device_id)
+    await setDoc(doc(firestore, "devices", device_id), {
+      side: null
+    });
+    subscriber = onSnapshot(doc(firestore, "devices", device_id), (doc) => {
       const response = doc.data()
       if (response?.side == "sender") {
         setShow(true);
       }
     });
-
-    return () => unsub();
-  }, [])
+  }
 
   function slideFromTop() {
     pan.setValue({
@@ -56,17 +70,11 @@ export default function SendCoin({ navigation }) {
 
   async function onThrowEffectEnd({ image }) {
     try {
-      await setDoc(doc(firestore, "devices", "test_device"), {
+      await setDoc(doc(firestore, "devices", deviceId), {
         side: "receiver",
         image
       });
     } catch (e) { }
-  }
-
-  async function resetData() {
-    await setDoc(doc(firestore, "devices", "test_device"), {
-      side: null
-    });
   }
 
   return (
