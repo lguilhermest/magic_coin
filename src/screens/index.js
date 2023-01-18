@@ -1,4 +1,6 @@
 import Home from "./Home";
+//Card
+import Card from "./Card/Card";
 //Coin
 import HideCoin from "./Coin/HideCoin";
 import CoinSelect from "./Coin/CoinSelect";
@@ -8,6 +10,7 @@ import SendCoin from "./Coin/SendCoin";
 import CodeReader from "./Settings/CodeReader";
 
 export {
+  Card,
   CodeReader,
   CoinSelect,
   Home,
