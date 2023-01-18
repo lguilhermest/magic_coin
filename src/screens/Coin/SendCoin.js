@@ -23,7 +23,7 @@ export default function SendCoin({ navigation }) {
     initialize();
 
     return () => {
-      if(subscriber){
+      if (subscriber) {
         subscriber()
       }
     };
@@ -78,10 +78,7 @@ export default function SendCoin({ navigation }) {
   }
 
   return (
-    <Container
-      onLongPress={() => navigation.navigate("Settings", { current: "SendCoin" })}
-      style={styles.container}
-    >
+    <Container style={styles.container}>
       <AnimatedCoin
         animatedValue={pan}
         hindOnTouchBorders={false}

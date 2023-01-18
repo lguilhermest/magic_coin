@@ -3,15 +3,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ActivityIndicator, Appearance, StatusBar } from "react-native";
 import {
-  CodeGenerate,
   CodeReader,
   CoinSelect,
   HideCoin,
   Home,
   ReceiveCoin,
-  ScreenSelect,
   SendCoin,
-  Settings
 } from "./src/screens";
 import { StorageService } from "./src/services";
 import { addDoc, collection } from "firebase/firestore";
@@ -21,7 +18,6 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [loading, setLoading] = useState(true);
-  const [initialRouteName, setInitialRouteName] = useState("Home");
 
   useEffect(() => {
     initialize();
@@ -29,10 +25,6 @@ export default function App() {
 
   async function initialize() {
     try {
-      const screenName = await StorageService.getData("initial_screen");
-      if (screenName) {
-        setInitialRouteName(screenName);
-      }
       const device_id = await StorageService.getData("device_id");
       if (!device_id) {
         const { id } = await addDoc(collection(firestore, "devices"), {
@@ -57,6 +49,7 @@ export default function App() {
           <Stack.Screen
             name="Home"
             component={Home}
+            options={{ headerShown: true }}
           />
           <Stack.Screen
             name="HideCoin"
@@ -77,18 +70,6 @@ export default function App() {
           />
         </Stack.Group>
         <Stack.Group screenOptions={{ presentation: "transparentModal", }}>
-          <Stack.Screen
-            name="Settings"
-            component={Settings}
-          />
-          <Stack.Screen
-            name="ScreenSelect"
-            component={ScreenSelect}
-          />
-          <Stack.Screen
-            name="CodeGenerate"
-            component={CodeGenerate}
-          />
           <Stack.Screen
             name="CodeReader"
             component={CodeReader}

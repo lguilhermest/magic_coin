@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Animated,
   StyleSheet,
@@ -35,7 +35,7 @@ export default function ReceiveCoin({ navigation }) {
     try {
       const device_id = await StorageService.getData("device_connection");
       if (device_id) {
-        setDeviceId(device_id)
+        setDeviceId(device_id);
         subscriber = onSnapshot(doc(firestore, "devices", device_id), (doc) => {
           const response = doc.data()
           if (response?.side == "receiver") {
@@ -53,21 +53,32 @@ export default function ReceiveCoin({ navigation }) {
       Animated.timing(pan, {
         toValue: {
           x: 0,
-          y: (window.height / 2) + SIZE / 2
+          y: 0
         },
         duration: 1000,
         useNativeDriver: true,
-      }).start(() => {
-        pan.extractOffset();
-      });
+      }).start();
     })
   }
 
   useEffect(() => {
     if (!!image) {
+      pan.setValue({
+        x: 0,
+        y: -window.height
+      })
       slideFromTop()
     }
   }, [image])
+
+  useEffect(() => {
+    if (!deviceId) {
+      pan.setValue({
+        x: 0,
+        y: -window.height
+      })
+    }
+  }, [deviceId])
 
   async function onThrowEffectEnd() {
     try {
@@ -78,19 +89,15 @@ export default function ReceiveCoin({ navigation }) {
   }
 
   return (
-    <Container
-      onLongPress={() => navigation.navigate("Settings", { current: "ReceiveCoin" })}
-      style={styles.container}
-    >
+    <Container style={styles.container}>
       {deviceId &&
         <AnimatedCoin
-          hidden
-          customImage={image}
           animatedValue={pan}
+          customImage={image}
           hindOnTouchBorders={false}
+          onThrowEffectEnd={onThrowEffectEnd}
           size={SIZE}
           throwEffect
-          onThrowEffectEnd={onThrowEffectEnd}
         />
       }
     </Container>

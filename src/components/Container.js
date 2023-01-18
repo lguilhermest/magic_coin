@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { DeviceEventEmitter, ImageBackground, TouchableWithoutFeedback } from "react-native";
+import { DeviceEventEmitter, ImageBackground } from "react-native";
 import { StorageService } from "../services";
 
 export default function Container(props) {
@@ -17,16 +17,11 @@ export default function Container(props) {
   }, []);
 
   return (
-    <TouchableWithoutFeedback
-      onPress={props.onPress}
-      onLongPress={props.onLongPress}
+    <ImageBackground
+      style={props.style}
+      source={{ uri: image }}
     >
-      <ImageBackground
-        style={props.style}
-        source={{ uri: image }}
-      >
-        {props.children}
-      </ImageBackground>
-    </TouchableWithoutFeedback>
+      {props.children}
+    </ImageBackground>
   )
 }
