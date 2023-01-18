@@ -18,7 +18,7 @@ export default function Container(props) {
 
   return (
     <ImageBackground
-      style={props.style}
+      style={[{ flex: 1 }, props.style]}
       source={{ uri: image }}
     >
       {props.children}

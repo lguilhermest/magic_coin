@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   DeviceEventEmitter,
   ScrollView,
   StatusBar,
@@ -18,11 +19,17 @@ export default function Home({ navigation }) {
   const [deviceId, setDeviceId] = useState();
 
   useEffect(() => {
-    (async () => {
-      const id = await StorageService.getData("device_id");
-      setDeviceId(id)
-    })()
+    initialize()
   }, [])
+
+  async function initialize() {
+    try {
+      const id = await StorageService.getData("device_id");
+      setDeviceId(String(id))
+    } catch (error) {
+
+    }
+  }
 
   const Row = ({ children, label, spread }) => {
     return (
@@ -40,12 +47,13 @@ export default function Home({ navigation }) {
     )
   }
 
-  const CardButton = ({ label, onPress }) => {
+  const CardButton = ({ label, onPress, onLongPress }) => {
     const height = screenWidth * .18;
     const width = screenWidth * .26;
     return (
       <TouchableOpacity
         activeOpacity={.6}
+        onLongPress={onLongPress}
         onPress={onPress}
         style={[
           styles.button,
@@ -72,17 +80,30 @@ export default function Home({ navigation }) {
     }
   };
 
+  async function removeBackground() {
+    await StorageService.removeItem("background_image");
+    DeviceEventEmitter.emit("background_image", {});
+    Alert.alert("Background removed");
+  }
+
   return (
     <ScrollView style={styles.container}>
-      <StatusBar barStyle={"dark-content"} />
+      <StatusBar barStyle={"dark-content"} backgroundColor={"#fff"} />
       <Row label={"Images"}>
         <CardButton
           label={"Background"}
+          onLongPress={removeBackground}
           onPress={() => pickImage()}
         />
         <CardButton
           label={"Coin"}
           onPress={() => navigation.navigate("CoinSelect")}
+        />
+      </Row>
+      <Row label={"Card Screens"}>
+        <CardButton
+          label={"Card"}
+          onPress={() => navigation.navigate("Card")}
         />
       </Row>
       <Row label={"Coin Screens"}>
@@ -105,15 +126,13 @@ export default function Home({ navigation }) {
           onPress={() => navigation.navigate("CodeReader")}
         />
       </Row>
-
-
       {!!deviceId &&
         <View style={{ alignSelf: "center", alignItems: "center", marginVertical: 20 }}>
           <Text style={styles.label}>Meu Código</Text>
           <View style={{ backgroundColor: "#fff", borderRadius: 5, padding: 10 }}>
             <QRCode
               size={150}
-              value={deviceId}
+              value={"UP2ADOUxLpGJPA7cMzQJ"}
             />
           </View>
         </View>
@@ -128,7 +147,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f2f2f2",
   },
   label: {
-    fontWeight: "bold",
     fontSize: 16,
     paddingHorizontal: 20,
     marginBottom: 10

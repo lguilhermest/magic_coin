@@ -17,13 +17,18 @@ class StorageService {
   }
 
   static async getData(key) {
-    return await AsyncStorage.getItem(key)
+    return await AsyncStorage.getItem(key);
   }
 
   static async getObject(key) {
-    const jsonValue = await AsyncStorage.getItem(key)
+    const jsonValue = await AsyncStorage.getItem(key);
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   }
+
+  static async removeItem(key) {
+    return await AsyncStorage.removeItem(key);
+  }
+
 }
 
 export default StorageService;
