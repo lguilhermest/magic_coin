@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { StorageService } from "../../services";
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { Alert, StyleSheet, Text, useWindowDimensions, Vibration, View } from "react-native";
-import { ModalScreen } from "../../components";
+import { Alert, Platform, StatusBar, StyleSheet, Text, useWindowDimensions, Vibration, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function CodeReader({ navigation }) {
-  const size = useWindowDimensions().width * .7
+  const paddingBottom = Platform.OS == "ios" ? useSafeAreaInsets().bottom + 40 : 0
+  const size = useWindowDimensions().width * .6;
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
 
@@ -38,17 +39,33 @@ export default function CodeReader({ navigation }) {
   }
 
   return (
-    <ModalScreen
-      centralize
-      containerStyle={{ backgroundColor: "#fff" }}
-      onBackdropPress={() => navigation.goBack()}
-    >
-      <View style={{ borderRadius: 10, height: size, width: size, overflow: "hidden" }}>
-        <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : handle}
-          style={{ flexGrow: 1 }}
+    <View style={{ flex: 1, backgroundColor: "#000", paddingBottom }}>
+      <BarCodeScanner
+        barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
+        onBarCodeScanned={scanned ? undefined : handle}
+        style={[styles.container]}
+      >
+        <StatusBar
+          backgroundColor={"#000"}
+          barStyle={"light-content"}
         />
-      </View>
-    </ModalScreen>
+        <View
+          style={{
+            borderRadius: 10,
+            height: size,
+            width: size,
+            backgroundColor: "#FFFFFF32"
+          }}
+        />
+      </BarCodeScanner>
+    </View >
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center"
+  }
+})

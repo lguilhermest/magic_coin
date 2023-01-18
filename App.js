@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { ActivityIndicator, Appearance, StatusBar } from "react-native";
+import { ActivityIndicator, Appearance, StatusBar, TouchableOpacity } from "react-native";
 import {
+  Card,
   CodeReader,
   CoinSelect,
   HideCoin,
@@ -13,8 +14,22 @@ import {
 import { StorageService } from "./src/services";
 import { addDoc, collection } from "firebase/firestore";
 import { firestore } from "./src/services/Firebase";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const Stack = createNativeStackNavigator();
+
+const CloseButton = ({ navigation }) => (
+  <TouchableOpacity
+    onPress={() => navigation.goBack()}
+    style={{ justifyContent: "center", height: "100%", paddingHorizontal: 10 }}
+  >
+    <Icon
+      color={"#FFF"}
+      name="close"
+      size={25}
+    />
+  </TouchableOpacity>
+)
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -51,6 +66,12 @@ export default function App() {
             component={Home}
             options={{ headerShown: true }}
           />
+          {/* Card Screens */}
+          <Stack.Screen
+            name="Card"
+            component={Card}
+          />
+          {/* Coin Screens */}
           <Stack.Screen
             name="HideCoin"
             component={HideCoin}
@@ -69,10 +90,19 @@ export default function App() {
             component={SendCoin}
           />
         </Stack.Group>
-        <Stack.Group screenOptions={{ presentation: "transparentModal", }}>
+        <Stack.Group>
           <Stack.Screen
             name="CodeReader"
             component={CodeReader}
+            options={({ navigation }) => ({
+              headerShown: true,
+              headerTitle: "",
+              presentation: "fullScreenModal",
+              headerStyle: {
+                backgroundColor: "#000"
+              },
+              headerLeft: () => <CloseButton navigation={navigation} />
+            })}
           />
         </Stack.Group>
       </Stack.Navigator>
