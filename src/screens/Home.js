@@ -25,10 +25,8 @@ export default function Home({ navigation }) {
   async function initialize() {
     try {
       const id = await StorageService.getData("device_id");
-      setDeviceId(String(id))
-    } catch (error) {
-
-    }
+      setDeviceId(id)
+    } catch (error) {}
   }
 
   const Row = ({ children, label, spread }) => {
@@ -132,7 +130,7 @@ export default function Home({ navigation }) {
           <View style={{ backgroundColor: "#fff", borderRadius: 5, padding: 10 }}>
             <QRCode
               size={150}
-              value={"UP2ADOUxLpGJPA7cMzQJ"}
+              value={deviceId}
             />
           </View>
         </View>
