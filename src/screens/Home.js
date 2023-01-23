@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
   DeviceEventEmitter,
   ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
-  TouchableOpacity,
-  useWindowDimensions,
+  ToastAndroid,
   View
 } from 'react-native';
+import { AlertService, StorageService } from '../services';
+import { HomeButton, Text } from '../components';
 import QRCode from 'react-native-qrcode-svg';
-import { StorageService } from '../services';
 import * as ImagePicker from 'expo-image-picker';
+import Color from '../Color';
 
 export default function Home({ navigation }) {
-  const screenWidth = useWindowDimensions().width - 20
   const [deviceId, setDeviceId] = useState();
 
   useEffect(() => {
@@ -26,42 +24,25 @@ export default function Home({ navigation }) {
     try {
       const id = await StorageService.getData("device_id");
       setDeviceId(id)
-    } catch (error) {}
+    } catch (error) { }
   }
 
-  const Row = ({ children, label, spread }) => {
-    return (
-      <View style={{ marginVertical: 10 }}>
-        <Text style={styles.label}>{label}</Text>
-        <ScrollView
-          bounces={false}
-          horizontal
-          contentContainerStyle={{ paddingLeft: 20 }}
-          showsHorizontalScrollIndicator={false}
-        >
-          {children}
-        </ScrollView>
-      </View>
-    )
-  }
-
-  const CardButton = ({ label, onPress, onLongPress }) => {
-    const height = screenWidth * .18;
-    const width = screenWidth * .26;
-    return (
-      <TouchableOpacity
-        activeOpacity={.6}
-        onLongPress={onLongPress}
-        onPress={onPress}
-        style={[
-          styles.button,
-          { height, width }
-        ]}
-      >
-        <Text style={styles.buttonLabel}>{label}</Text>
-      </TouchableOpacity>
-    )
-  }
+  async function check() {
+    try {
+      const hasImage = await StorageService.getData("background_image");
+      if (!hasImage) {
+        AlertService.confirmAction({
+          cancelable: false,
+          title: "Atenção",
+          message: "A imagem selecionada ficará visível apenas nas telas de truques",
+          confirmText: "Ok",
+          onConfirmPress: () => pickImage()
+        })
+      } else {
+        pickImage()
+      }
+    } catch (error) { }
+  };
 
   async function pickImage() {
     try {
@@ -76,54 +57,76 @@ export default function Home({ navigation }) {
     } catch (error) {
       console.log(error);
     }
-  };
+  }
 
   async function removeBackground() {
     await StorageService.removeItem("background_image");
     DeviceEventEmitter.emit("background_image", {});
-    Alert.alert("Background removed");
+    ToastAndroid.show('Imagem removida!', ToastAndroid.SHORT);
   }
+
+  const Card = ({ label, children, fill }) => (
+    <View style={styles.card}>
+      <Text size='headline' weight='medium' style={styles.cardLabel}>{label}</Text>
+      <View style={styles.cardContent}>
+        {children}
+        {fill &&
+          <View style={{ flexGrow: 1 }} />
+        }
+      </View>
+    </View>
+  )
 
   return (
     <ScrollView style={styles.container}>
-      <StatusBar barStyle={"dark-content"} backgroundColor={"#fff"} />
-      <Row label={"Images"}>
-        <CardButton
-          label={"Background"}
-          onLongPress={removeBackground}
-          onPress={() => pickImage()}
-        />
-        <CardButton
-          label={"Coin"}
-          onPress={() => navigation.navigate("CoinSelect")}
-        />
-      </Row>
-      <Row label={"Card Screens"}>
-        <CardButton
-          label={"Card"}
-          onPress={() => navigation.navigate("Card")}
-        />
-      </Row>
-      <Row label={"Coin Screens"}>
-        <CardButton
-          label={"Hide"}
+      <StatusBar
+        barStyle={"light-content"}
+        backgroundColor={Color.accent}
+      />
+      <Card label={'Truques com moeda'}>
+        <HomeButton
+          icon={{
+            name: "gesture-tap-box"
+          }}
+          label={"Esconder"}
           onPress={() => navigation.navigate("HideCoin")}
         />
-        <CardButton
-          label={"Send"}
+        <HomeButton
+          icon={{ name: "gesture-swipe-up" }}
+          label={"Enviar"}
           onPress={() => navigation.navigate("SendCoin")}
         />
-        <CardButton
-          label={"Receive"}
+        <HomeButton
+          icon={{ name: "arrow-down-thin" }}
+          label={"Receber"}
           onPress={() => navigation.navigate("ReceiveCoin")}
         />
-      </Row>
+      </Card>
+
+      <Card label={'Ajustes'}>
+        <HomeButton
+          icon={{ name: "image-outline" }}
+          label={"Imagem de fundo"}
+          onPress={() => check()}
+        />
+        <HomeButton
+          icon={{ name: "image-remove" }}
+          label={"Remover Imagem"}
+          onPress={() => removeBackground()}
+        />
+        <HomeButton
+          icon={{ name: "image-filter-tilt-shift" }}
+          label={"Selecionar Moeda"}
+          onPress={() => navigation.navigate("CoinSelect")}
+        />
+      </Card>
+      {/* <Row label={"Images"}>
       <Row label={"Connection"}>
         <CardButton
           label={"Read"}
           onPress={() => navigation.navigate("CodeReader")}
         />
-      </Row>
+      </Row> */}
       {!!deviceId &&
         <View style={{ alignSelf: "center", alignItems: "center", marginVertical: 20 }}>
           <Text style={styles.label}>Meu Código</Text>
@@ -133,6 +136,9 @@ export default function Home({ navigation }) {
               value={deviceId}
             />
           </View>
+          <Text center size='footnote' style={{ maxWidth: "60%" }}>
+            É necessário conectar dois dispositivos para o truque de enviar e receber
+          </Text>
         </View>
       }
     </ScrollView>
@@ -143,6 +149,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f2f2f2",
+    padding: 10
   },
   label: {
     fontSize: 16,
@@ -152,15 +159,16 @@ const styles = StyleSheet.create({
   row: {
     marginBottom: 20
   },
-  button: {
-    alignItems: "center",
-    backgroundColor: "#989898",
-    borderRadius: 5,
-    justifyContent: "center",
-    marginRight: 10,
+  card: {
+    marginBottom: 20
   },
-  buttonLabel: {
-    color: "#fff",
-    fontSize: 16
+  cardLabel: {
+    padding: 5
+  },
+  cardContent: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    paddingTop: 10
   }
 });
