@@ -1,11 +1,30 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { ModalScreen } from "../../components";
+import { PixelRatio, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
-import { StorageService } from "../../services";
+import { AlertService, StorageService } from "../../services";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { fontNormalize, iconSize } from "../../Typography";
 
 export default function Settings({ navigation, route }) {
   const { current } = route.params ?? { current: null }
+
+  async function check() {
+    try {
+      const hasImage = await StorageService.getData("background_image");
+      if (!hasImage) {
+        AlertService.confirmAction({
+          cancelable: false,
+          title: "Atenção",
+          message: "A imagem selecionada ficará visível apenas nas telas de truques",
+          confirmText: "Ok",
+          onConfirmPress: () => pickImage()
+        })
+      } else {
+        pickImage()
+      }
+    } catch (error) { }
+  };
+
   async function pickImage() {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -14,88 +33,64 @@ export default function Settings({ navigation, route }) {
         aspect: [4, 3],
         quality: 1,
       })
-      await StorageService.storeData("background_image", result.assets[0].uri)
-      navigation.goBack()
-    } catch (error) { }
-  };
+      await StorageService.storeData("background_image", result.assets[0].uri);
+      DeviceEventEmitter.emit("background_image", {})
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const Button = ({ label, onPress, hidden = false }) => (
     <TouchableOpacity
       style={[styles.button, hidden && { display: "none" }]}
       onPress={onPress}
     >
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label}>
+        {label}
+      </Text>
+      <Icon
+        name="chevron-right"
+        size={iconSize.regular}
+      />
     </TouchableOpacity>
   )
 
   return (
-    <ModalScreen
+    <View
       style={styles.container}
       onBackdropPress={() => navigation.goBack()}
     >
       <Button
-        label={"Moeda"}
-        onPress={() => navigation.replace("CoinSelect")}
+        label={"Alterar Moeda"}
+        onPress={() => navigation.navigate("CoinSelect")}
       />
       <Button
         label={"Imagem de fundo"}
-        onPress={pickImage}
+        onPress={check}
       />
       <Button
-        hidden={current != "SendCoin"}
-        label={"Share Code"}
-        onPress={() => navigation.replace("CodeGenerate")}
+        label={"Definir tela inicial"}
+        onPress={() => navigation.navigate("ScreenSelect")}
       />
       <Button
-        hidden={current != "ReceiveCoin"}
-        label={"Read Code"}
-        onPress={() => navigation.replace("CodeReader")}
+        label={"Ler código"}
+        onPress={() => navigation.navigate("CodeReader")}
       />
-      <Button
-        label={"Tela inicial"}
-        onPress={() => navigation.replace("ScreenSelect")}
-      />
-      <Button
-        hidden={current == "Home"}
-        label={"Home"}
-        onPress={() => {
-          navigation.popToTop();
-          navigation.navigate("Home");
-        }}
-      />
-      <Button
-        hidden={current == "SendCoin"}
-        label={"Sender"}
-        onPress={() => {
-          navigation.popToTop();
-          navigation.navigate("SendCoin");
-        }}
-      />
-      <Button
-        hidden={current == "ReceiveCoin"}
-        label={"Receiver"}
-        onPress={() => {
-          navigation.popToTop();
-          navigation.navigate("ReceiveCoin");
-        }}
-      />
-    </ModalScreen>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
-    backgroundColor: "#fff",
-    padding: 10,
-    paddingTop: 20
+    flex: 1,
+    padding: 10
   },
   button: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     borderColor: "#999",
-    borderRadius: 5,
-    borderWidth: .5,
-    marginBottom: 10,
+    borderBottomWidth: PixelRatio.roundToNearestPixel(1),
     padding: 10
   },
   label: {

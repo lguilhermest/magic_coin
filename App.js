@@ -8,13 +8,9 @@ import {
   TouchableOpacity
 } from "react-native";
 import {
-  Card,
   CodeReader,
-  CoinSelect,
-  HideCoin,
   Home,
-  ReceiveCoin,
-  SendCoin,
+  ScreenSelect,
 } from "./src/screens";
 import { StorageService } from "./src/services";
 import { addDoc, collection } from "firebase/firestore";
@@ -29,6 +25,8 @@ import {
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Color from "./src/Color";
 import Typography from "./src/Typography";
+import CoinScreens from "./src/screens/Coin";
+import SettingsScreens, { SettingsModals } from "./src/screens/Settings";
 
 const Stack = createNativeStackNavigator();
 
@@ -73,6 +71,40 @@ export default function App() {
     setLoading(false)
   }
 
+  function renderScreens(screens, modal = false) {
+    return (
+      <>
+        {screens.map((screen, i) => {
+          const { component, name, options, halfModal } = screen;
+          return (
+            <Stack.Screen
+              key={i}
+              name={name}
+              component={component}
+              options={({ navigation }) => ({
+                ...options,
+                ...(modal && {
+                  headerShown: true,
+                  headerTitle: "",
+                  headerStyle: {
+                    backgroundColor: "#000"
+                  },
+                  headerBackVisible: false,
+                  headerRight: () => <CloseButton navigation={navigation} />
+                }),
+                ...(halfModal && {
+                  presentation: "transparentModal",
+                  headerMode: "none",
+                  headerRight: null
+                })
+              })}
+            />
+          )
+        })}
+      </>
+    )
+  }
+
   if (loading || !fontsLoaded) {
     return <ActivityIndicator style={{ flex: 1, justifyContent: "center" }} />
   }
@@ -95,39 +127,16 @@ export default function App() {
             name="Home"
             component={Home}
             options={{
-              title: "Vamos começar",
+              title: "Selecione um opção",
               headerShown: true
             }}
           />
-          {/* Card Screens */}
-          <Stack.Screen
-            name="Card"
-            component={Card}
-          />
-          {/* Coin Screens */}
-          <Stack.Screen
-            name="HideCoin"
-            component={HideCoin}
-          />
-          <Stack.Screen
-            name="CoinSelect"
-            component={CoinSelect}
-            options={{
-              headerShown: true,
-              headerTitle: "Selecione uma moeda"
-            }}
-          />
-          <Stack.Screen
-            name="ReceiveCoin"
-            component={ReceiveCoin}
-          />
-          <Stack.Screen
-            name="SendCoin"
-            component={SendCoin}
-          />
+          {renderScreens(CoinScreens)}
+          {renderScreens(SettingsScreens)}
         </Stack.Group>
+
         <Stack.Group>
-          <Stack.Screen
+          {/* <Stack.Screen
             name="CodeReader"
             component={CodeReader}
             options={({ navigation }) => ({
@@ -139,6 +148,15 @@ export default function App() {
               },
               headerLeft: () => <CloseButton navigation={navigation} />
             })}
+          /> */}
+          {renderScreens(SettingsModals, true)}
+          <Stack.Screen
+            name="ScreenSelect"
+            component={ScreenSelect}
+            options={{
+              header: "none",
+              presentation: "transparentModal"
+            }}
           />
         </Stack.Group>
       </Stack.Navigator>

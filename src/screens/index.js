@@ -7,6 +7,8 @@ import CoinSelect from "./Coin/CoinSelect";
 import ReceiveCoin from "./Coin/ReceiveCoin";
 import SendCoin from "./Coin/SendCoin";
 //Settings
+import Settings from "./Settings/Settings";
+import ScreenSelect from "./Settings/ScreenSelect";
 import CodeReader from "./Settings/CodeReader";
 
 export {
@@ -16,5 +18,7 @@ export {
   Home,
   HideCoin,
   ReceiveCoin,
-  SendCoin
+  ScreenSelect,
+  SendCoin,
+  Settings
 }

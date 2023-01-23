@@ -23,6 +23,7 @@ export default function ScreenSelect({ navigation }) {
 
   return (
     <ModalScreen
+      backdrop
       style={styles.container}
       onBackdropPress={() => navigation.goBack()}
     >

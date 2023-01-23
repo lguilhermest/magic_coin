@@ -1,7 +1,7 @@
 import { Dimensions } from "react-native"
 const { width, fontScale } = Dimensions.get("screen")
 
-function fontNormalize(size) {
+export function fontNormalize(size) {
   const defaultValue = Number(423 / size).toPrecision(3)
   const toScale = defaultValue * fontScale
   return Math.floor(width / toScale)
@@ -26,7 +26,7 @@ export const fontSize = {
 
 export const iconSize = {
   small: fontNormalize(19),
-  regular: fontNormalize(19),
+  regular: fontNormalize(40),
 }
 
 export default {
