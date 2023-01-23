@@ -26,7 +26,7 @@ export default function HomeButton(props: Props) {
     >
       <View style={styles.content}>
         <Icon
-          color={props.icon?.color ?? Color.surface}
+          color={props.icon?.color ?? Color.background}
           name={props.icon?.name ?? "close"}
           size={props.icon?.size ?? 35}
         />

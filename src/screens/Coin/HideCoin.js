@@ -1,18 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import {
   Animated,
+  Appearance,
+  StatusBar,
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
-import { AnimatedCoin, Container } from '../../components';
+import { AnimatedCoin, Container, InfoCard } from '../../components';
+import { StorageService } from '../../services';
 
 const SIZE = 180;
+
+const topics = [
+  {
+    items: [
+      { label: "Clique e arraste para movimentar a moeda;" },
+      { label: "A moeda desaparecerá quando tocar nas bordas da tela;" },
+      { label: "Movimente rapidamente o celuar para fazer a moeda aparecer;" },
+      { label: "A moeda surgirá no top e se moverá para o centro em um movimento rápido;" }
+    ]
+  }
+]
 
 export default function HideCoin({ navigation }) {
   const pan = new Animated.ValueXY();
   const window = useWindowDimensions();
+  const [showInfo, setShowInfo] = useState(false);
   const [enableShow, setEnableShow] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const visualized = await StorageService.getData("screen_hide_coin");
+      if (!visualized) {
+        setShowInfo(true);
+      }
+    })()
+  }, [])
 
   useEffect(() => {
     if (enableShow) {
@@ -54,6 +78,13 @@ export default function HideCoin({ navigation }) {
       onLongPress={() => navigation.navigate("Settings", { current: "Home" })}
       style={styles.container}
     >
+      <StatusBar hidden />
+      <InfoCard
+        title={"Instruções"}
+        topics={topics}
+        onBackdropPress={() => setShowInfo(false)}
+        visible={showInfo}
+      />
       <AnimatedCoin
         animatedValue={pan}
         size={SIZE}
