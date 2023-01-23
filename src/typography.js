@@ -8,7 +8,7 @@ function fontNormalize(size) {
 }
 
 export const fontFamily = {
-  black: 'Nunito-Black',
+  black: 'Nunito_900Black',
   bold: 'Nunito_700Bold',
   medium: 'Nunito_500Medium',
   regular: 'Nunito_400Regular'

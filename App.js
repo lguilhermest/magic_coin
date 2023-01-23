@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { ActivityIndicator, Appearance, StatusBar, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  Appearance,
+  StatusBar,
+  TouchableOpacity
+} from "react-native";
 import {
   Card,
   CodeReader,
@@ -18,11 +23,12 @@ import {
   Nunito_400Regular,
   Nunito_700Bold,
   Nunito_500Medium,
+  Nunito_900Black,
   useFonts
 } from "@expo-google-fonts/nunito"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import * as NavigationBar from 'expo-navigation-bar';
 import Color from "./src/Color";
+import Typography from "./src/Typography";
 
 const Stack = createNativeStackNavigator();
 
@@ -41,7 +47,7 @@ const CloseButton = ({ navigation }) => (
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    Nunito_400Regular, Nunito_700Bold, Nunito_500Medium
+    Nunito_900Black, Nunito_700Bold, Nunito_500Medium, Nunito_400Regular
   });
   const [loading, setLoading] = useState(true);
 
@@ -78,6 +84,9 @@ export default function App() {
         screenOptions={{
           headerShown: false,
           headerTintColor: Color.background,
+          headerTitleStyle: {
+            fontFamily: Typography.fontFamily.regular
+          },
           headerStyle: { backgroundColor: Color.accent }
         }}
       >
@@ -86,7 +95,7 @@ export default function App() {
             name="Home"
             component={Home}
             options={{
-              title: "Selecione uma Mágica",
+              title: "Vamos começar",
               headerShown: true
             }}
           />
@@ -103,7 +112,10 @@ export default function App() {
           <Stack.Screen
             name="CoinSelect"
             component={CoinSelect}
-            options={{ headerShown: true }}
+            options={{
+              headerShown: true,
+              headerTitle: "Selecione uma moeda"
+            }}
           />
           <Stack.Screen
             name="ReceiveCoin"
