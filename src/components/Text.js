@@ -1,6 +1,7 @@
 import React from "react";
 import { Text as RNText, TextProps } from "react-native";
-import { fontFamily, fontSize } from "../typography";
+import Color from "../Color";
+import { fontFamily, fontSize } from "../Typography";
 
 type Props = TextProps & {
   bold?: Boolean,
@@ -18,7 +19,7 @@ export default function Text(props: Props) {
       {...props}
       style={[
         {
-          color: props.color ?? "#000",
+          color: props.color ?? Color.surface,
           fontSize: fontSize[props.size ?? "body"],
           fontFamily: fontFamily[props.weight ?? "regular"]
         },

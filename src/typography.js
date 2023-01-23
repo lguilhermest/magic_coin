@@ -7,25 +7,29 @@ function fontNormalize(size) {
   return Math.floor(width / toScale)
 }
 
-const fontFamily = {
+export const fontFamily = {
   black: 'Nunito-Black',
   bold: 'Nunito_700Bold',
   medium: 'Nunito_500Medium',
   regular: 'Nunito_400Regular'
 }
 
-const fontSize = {
+export const fontSize = {
   largeTitle: fontNormalize(40),
   title: fontNormalize(27),
   subtitle: fontNormalize(22),
-  tall: fontNormalize(19),
   headline: fontNormalize(19),
   body: fontNormalize(17),
   small: fontNormalize(15),
   footnote: fontNormalize(13),
 }
 
-export {
+export const iconSize = {
+  small: fontNormalize(19),
+  regular: fontNormalize(19),
+}
+
+export default {
   fontFamily,
   fontSize
 }

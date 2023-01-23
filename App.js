@@ -21,6 +21,8 @@ import {
   useFonts
 } from "@expo-google-fonts/nunito"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import * as NavigationBar from 'expo-navigation-bar';
+import Color from "./src/Color";
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +51,8 @@ export default function App() {
 
   async function initialize() {
     try {
+      /* await NavigationBar.setBackgroundColorAsync(Color.accent);
+      await NavigationBar.setButtonStyleAsync("light"); */
       const device_id = await StorageService.getData("device_id");
       if (!device_id) {
         const { id } = await addDoc(collection(firestore, "devices"), {
@@ -70,7 +74,13 @@ export default function App() {
   return (
     <NavigationContainer>
       <StatusBar barStyle={Appearance.getColorScheme() == "dark" ? "dark-content" : "light-content"} />
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          headerTintColor: Color.background,
+          headerStyle: { backgroundColor: Color.accent }
+        }}
+      >
         <Stack.Group>
           <Stack.Screen
             name="Home"
