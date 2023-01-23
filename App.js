@@ -14,6 +14,12 @@ import {
 import { StorageService } from "./src/services";
 import { addDoc, collection } from "firebase/firestore";
 import { firestore } from "./src/services/Firebase";
+import {
+  Nunito_400Regular,
+  Nunito_700Bold,
+  Nunito_500Medium,
+  useFonts
+} from "@expo-google-fonts/nunito"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const Stack = createNativeStackNavigator();
@@ -32,6 +38,9 @@ const CloseButton = ({ navigation }) => (
 )
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Nunito_400Regular, Nunito_700Bold, Nunito_500Medium
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,11 +57,13 @@ export default function App() {
         });
         await StorageService.storeData("device_id", id);
       }
-    } catch (error) { }
+    } catch (error) {
+      console.log("ERRO", error);
+    }
     setLoading(false)
   }
 
-  if (loading) {
+  if (loading || !fontsLoaded) {
     return <ActivityIndicator style={{ flex: 1, justifyContent: "center" }} />
   }
 
@@ -64,6 +75,10 @@ export default function App() {
           <Stack.Screen
             name="Home"
             component={Home}
+            options={{
+              title: "Selecione uma Mágica",
+              headerShown: true
+            }}
           />
           {/* Card Screens */}
           <Stack.Screen
