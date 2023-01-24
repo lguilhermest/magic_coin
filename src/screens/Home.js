@@ -70,9 +70,7 @@ export default function Home({ navigation }) {
       <Text size='headline' weight='medium' style={styles.cardLabel}>{label}</Text>
       <View style={styles.cardContent}>
         {children}
-        {fill &&
-          <View style={{ flexGrow: 1 }} />
-        }
+        {fill && <View style={{ width: "33%" }} />}
       </View>
     </View>
   )
@@ -97,46 +95,39 @@ export default function Home({ navigation }) {
           onPress={() => navigation.navigate("SendCoin")}
         />
         <HomeButton
-          icon={{ name: "arrow-down-thin" }}
+          icon={{ name: "cellphone-arrow-down" }}
           label={"Receber"}
           onPress={() => navigation.navigate("ReceiveCoin")}
         />
       </Card>
 
-      <Card label={'Ajustes'}>
+      <Card label={'Extras'} fill>
         <HomeButton
-          icon={{ name: "image-outline" }}
-          label={"Imagem de fundo"}
-          onPress={() => check()}
+          icon={{ name: "tools" }}
+          label={"Configurações"}
+          onPress={() => navigation.navigate("Settings")}
         />
         <HomeButton
-          icon={{ name: "image-remove" }}
-          label={"Remover Imagem"}
-          onPress={() => removeBackground()}
+          icon={{ name: "star" }}
+          label={"Avalie o App"}
+          onPress={() => navigation.navigate("CoinSelect")}
         />
         <HomeButton
-          icon={{ name: "image-filter-tilt-shift" }}
-          label={"Selecionar Moeda"}
+          icon={{ name: "share-variant" }}
+          label={"Compartilhe"}
           onPress={() => navigation.navigate("CoinSelect")}
         />
       </Card>
-      {/* <Row label={"Images"}>
-      <Row label={"Connection"}>
-        <CardButton
-          label={"Read"}
-          onPress={() => navigation.navigate("CodeReader")}
-        />
-      </Row> */}
       {!!deviceId &&
         <View style={{ alignSelf: "center", alignItems: "center", marginVertical: 20 }}>
-          <Text style={styles.label}>Meu Código</Text>
+          <Text bold style={styles.label}>Meu Código</Text>
           <View style={{ backgroundColor: "#fff", borderRadius: 5, padding: 10 }}>
             <QRCode
               size={150}
               value={deviceId}
             />
           </View>
-          <Text center size='footnote' style={{ maxWidth: "60%" }}>
+          <Text center size='footnote' style={{ marginTop: 10, maxWidth: "60%" }}>
             É necessário conectar dois dispositivos para o truque de enviar e receber
           </Text>
         </View>
@@ -152,7 +143,6 @@ const styles = StyleSheet.create({
     padding: 10
   },
   label: {
-    fontSize: 16,
     paddingHorizontal: 20,
     marginBottom: 10
   },
