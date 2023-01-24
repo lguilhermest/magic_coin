@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ActivityIndicator, Appearance, StatusBar } from "react-native";
-import { StorageService } from "./src/services";
-import { addDoc, collection } from "firebase/firestore";
+import { NotificationService, StorageService } from "./src/services";
+import { doc, setDoc } from "firebase/firestore";
 import { firestore } from "./src/services/Firebase";
-import Color from "./src/Color";
-import Typography from "./src/Typography";
 import { renderStack } from "./src/helpers/Navigation";
 import {
   Nunito_400Regular,
@@ -18,10 +16,14 @@ import {
 import { Home } from "./src/screens";
 import CoinScreens from "./src/screens/Coin";
 import SettingsScreens, { SettingsModals } from "./src/screens/Settings";
+import Color from "./src/Color";
+import Typography from "./src/Typography";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const listener = useRef();
+
   const renderScreens = renderStack(Stack);
   const [fontsLoaded] = useFonts({
     Nunito_900Black, Nunito_700Bold, Nunito_500Medium, Nunito_400Regular
@@ -30,18 +32,17 @@ export default function App() {
 
   useEffect(() => {
     initialize();
+    // listener.current = Notifications.addNotificationReceivedListener(notification => { });
+
+    /* return () => {
+      Notifications.removeNotificationSubscription(listener.current);
+    }; */
   }, [])
 
   async function initialize() {
     try {
-      const device_id = await StorageService.getData("device_id");
-      if (!device_id) {
-        const { id } = await addDoc(collection(firestore, "devices"), {
-          side: null,
-          image: null
-        });
-        await StorageService.storeData("device_id", id);
-      }
+      const token = await NotificationService.registerToken();
+      await StorageService.storeData("push_token", token);
     } catch (error) { }
     setLoading(false)
   }
