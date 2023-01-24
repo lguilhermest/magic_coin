@@ -17,6 +17,14 @@ export const SettingsModals = [
   {
     name: "CodeReader",
     component: CodeReader
+  },
+  {
+    name: "ScreenSelect",
+    component: ScreenSelect,
+    options: {
+      header: "none",
+      presentation: "transparentModal"
+    }
   }
 ]
 

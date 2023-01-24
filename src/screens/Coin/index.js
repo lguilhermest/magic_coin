@@ -1,4 +1,5 @@
 import CoinSelect from "./CoinSelect";
+import CoinSettings from "./CoinSettings";
 import HideCoin from "./HideCoin";
 import ReceiveCoin from "./ReceiveCoin";
 import SendCoin from "./SendCoin";
@@ -23,6 +24,14 @@ const CoinScreens = [
   {
     name: "SendCoin",
     component: SendCoin
+  },
+  {
+    name: "CoinSettings",
+    component: CoinSettings,
+    options: {
+      headerShown: true,
+      headerTitle: "Ajustes Moeda"
+    }
   }
 ]
 

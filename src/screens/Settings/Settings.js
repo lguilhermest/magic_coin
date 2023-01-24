@@ -69,6 +69,10 @@ export default function Settings({ navigation, route }) {
         onPress={check}
       />
       <Button
+        label={"Configurar truques"}
+        onPress={() => navigation.navigate("CoinSettings")}
+      />
+      <Button
         label={"Definir tela inicial"}
         onPress={() => navigation.navigate("ScreenSelect")}
       />

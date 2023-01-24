@@ -1,49 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import {
-  ActivityIndicator,
-  Appearance,
-  StatusBar,
-  TouchableOpacity
-} from "react-native";
-import {
-  CodeReader,
-  Home,
-  ScreenSelect,
-} from "./src/screens";
+import { ActivityIndicator, Appearance, StatusBar } from "react-native";
 import { StorageService } from "./src/services";
 import { addDoc, collection } from "firebase/firestore";
 import { firestore } from "./src/services/Firebase";
+import Color from "./src/Color";
+import Typography from "./src/Typography";
+import { renderStack } from "./src/helpers/Navigation";
 import {
   Nunito_400Regular,
   Nunito_700Bold,
   Nunito_500Medium,
   Nunito_900Black,
   useFonts
-} from "@expo-google-fonts/nunito"
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import Color from "./src/Color";
-import Typography from "./src/Typography";
+} from "@expo-google-fonts/nunito";
+import { Home } from "./src/screens";
 import CoinScreens from "./src/screens/Coin";
 import SettingsScreens, { SettingsModals } from "./src/screens/Settings";
 
 const Stack = createNativeStackNavigator();
 
-const CloseButton = ({ navigation }) => (
-  <TouchableOpacity
-    onPress={() => navigation.goBack()}
-    style={{ justifyContent: "center", height: "100%", paddingHorizontal: 10 }}
-  >
-    <Icon
-      color={"#FFF"}
-      name="close"
-      size={25}
-    />
-  </TouchableOpacity>
-)
-
 export default function App() {
+  const renderScreens = renderStack(Stack);
   const [fontsLoaded] = useFonts({
     Nunito_900Black, Nunito_700Bold, Nunito_500Medium, Nunito_400Regular
   });
@@ -55,8 +34,6 @@ export default function App() {
 
   async function initialize() {
     try {
-      /* await NavigationBar.setBackgroundColorAsync(Color.accent);
-      await NavigationBar.setButtonStyleAsync("light"); */
       const device_id = await StorageService.getData("device_id");
       if (!device_id) {
         const { id } = await addDoc(collection(firestore, "devices"), {
@@ -65,44 +42,8 @@ export default function App() {
         });
         await StorageService.storeData("device_id", id);
       }
-    } catch (error) {
-      console.log("ERRO", error);
-    }
+    } catch (error) { }
     setLoading(false)
-  }
-
-  function renderScreens(screens, modal = false) {
-    return (
-      <>
-        {screens.map((screen, i) => {
-          const { component, name, options, halfModal } = screen;
-          return (
-            <Stack.Screen
-              key={i}
-              name={name}
-              component={component}
-              options={({ navigation }) => ({
-                ...options,
-                ...(modal && {
-                  headerShown: true,
-                  headerTitle: "",
-                  headerStyle: {
-                    backgroundColor: "#000"
-                  },
-                  headerBackVisible: false,
-                  headerRight: () => <CloseButton navigation={navigation} />
-                }),
-                ...(halfModal && {
-                  presentation: "transparentModal",
-                  headerMode: "none",
-                  headerRight: null
-                })
-              })}
-            />
-          )
-        })}
-      </>
-    )
   }
 
   if (loading || !fontsLoaded) {
@@ -136,29 +77,9 @@ export default function App() {
         </Stack.Group>
 
         <Stack.Group>
-          {/* <Stack.Screen
-            name="CodeReader"
-            component={CodeReader}
-            options={({ navigation }) => ({
-              headerShown: true,
-              headerTitle: "",
-              presentation: "fullScreenModal",
-              headerStyle: {
-                backgroundColor: "#000"
-              },
-              headerLeft: () => <CloseButton navigation={navigation} />
-            })}
-          /> */}
           {renderScreens(SettingsModals, true)}
-          <Stack.Screen
-            name="ScreenSelect"
-            component={ScreenSelect}
-            options={{
-              header: "none",
-              presentation: "transparentModal"
-            }}
-          />
         </Stack.Group>
+
       </Stack.Navigator>
     </NavigationContainer>
   )
