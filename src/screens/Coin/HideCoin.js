@@ -38,6 +38,11 @@ export default function HideCoin({ navigation }) {
     })()
   }, [])
 
+  async function onClose() {
+    setShowInfo(false);
+    StorageService.storeData("screen_hide_coin", 'true');
+  }
+
   useEffect(() => {
     if (enableShow) {
       pan.setValue({
@@ -82,7 +87,7 @@ export default function HideCoin({ navigation }) {
       <InfoCard
         title={"Instruções"}
         topics={topics}
-        onBackdropPress={() => setShowInfo(false)}
+        onBackdropPress={onClose}
         visible={showInfo}
       />
       <AnimatedCoin

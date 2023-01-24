@@ -53,11 +53,10 @@ export default function InfoCard(props: Props) {
                 <View style={styles.topicItem} key={id}>
                   <Icon
                     color={Color.accent}
-                    style={{ paddingTop: 3 }}
                     size={iconSize.small}
                     name="circle-medium"
                   />
-                  <Text style={{ flex: 1 }}>
+                  <Text size="small" style={{ flex: 1 }}>
                     {item.label}
                   </Text>
                 </View>
