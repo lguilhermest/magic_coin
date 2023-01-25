@@ -46,4 +46,15 @@ export default class NotificationService {
     return Notifications.removeNotificationSubscription(listener);
   }
 
+  static async send(to, data) {
+    return await fetch("https://exp.host/--/api/v2/push/send", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        to, data
+      })
+    })
+  }
 }

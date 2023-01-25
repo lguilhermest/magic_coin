@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { ActivityIndicator, Appearance, StatusBar } from "react-native";
+import { ActivityIndicator, Appearance, DeviceEventEmitter, StatusBar } from "react-native";
 import { NotificationService, StorageService } from "./src/services";
 import { doc, setDoc } from "firebase/firestore";
 import { firestore } from "./src/services/Firebase";
@@ -32,11 +32,17 @@ export default function App() {
 
   useEffect(() => {
     initialize();
-    // listener.current = Notifications.addNotificationReceivedListener(notification => { });
 
-    /* return () => {
-      Notifications.removeNotificationSubscription(listener.current);
-    }; */
+    listener.current = NotificationService.addListener((notification) => {
+      const { data } = notification.request.content;
+
+      console.log(data.type);
+      DeviceEventEmitter.emit(data.type, data)
+    })
+
+    return () => {
+      NotificationService.removeListener(listener.current)
+    };
   }, [])
 
   async function initialize() {

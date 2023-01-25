@@ -1,5 +1,13 @@
 import React from "react";
-import { Modal, Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  StyleSheet,
+  TextStyle,
+  TouchableOpacity,
+  View
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Color from "../Color";
 import { iconSize } from "../Typography";
@@ -17,6 +25,11 @@ type Props = {
     }>
   }>,
   title?: String,
+  message?: String,
+  loading?: Boolean | {
+    size?: 'large' | 'small' | Number,
+    style?: TextStyle
+  },
   visible?: Boolean
 }
 
@@ -63,12 +76,25 @@ export default function InfoCard(props: Props) {
               )}
             </View>
           )}
-          <TouchableOpacity
-            style={styles.button}
-            onPress={cancelable ? props.onBackdropPress : props.onConfirm}
-          >
-            <Text size="headline" bold color={Color.accent}>Ok</Text>
-          </TouchableOpacity>
+          {props.message &&
+            <Text center size="body">
+              {props.message}
+            </Text>
+          }
+          {props.loading ?
+            <ActivityIndicator
+              color={Color.accent}
+              style={{ marginVertical: 10 }}
+              size={props.loading?.size ?? 'large'}
+            />
+            :
+            <TouchableOpacity
+              style={styles.button}
+              onPress={cancelable ? props.onBackdropPress : props.onConfirm}
+            >
+              <Text size="headline" bold color={Color.accent}>Ok</Text>
+            </TouchableOpacity>
+          }
         </View>
       </View>
     </Modal>

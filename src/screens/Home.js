@@ -1,68 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import {
-  DeviceEventEmitter,
   ScrollView,
   StatusBar,
   StyleSheet,
-  ToastAndroid,
   View
 } from 'react-native';
-import { AlertService, StorageService } from '../services';
+import { StorageService } from '../services';
 import { HomeButton, Text } from '../components';
 import QRCode from 'react-native-qrcode-svg';
-import * as ImagePicker from 'expo-image-picker';
 import Color from '../Color';
 
 export default function Home({ navigation }) {
-  const [deviceId, setDeviceId] = useState();
+  const [pushToken, setPushToken] = useState();
 
   useEffect(() => {
-    initialize()
+    initialize();
   }, [])
 
   async function initialize() {
-    try {
-      const id = await StorageService.getData("device_id");
-      setDeviceId(id)
-    } catch (error) { }
-  }
-
-  async function check() {
-    try {
-      const hasImage = await StorageService.getData("background_image");
-      if (!hasImage) {
-        AlertService.confirmAction({
-          cancelable: false,
-          title: "Atenção",
-          message: "A imagem selecionada ficará visível apenas nas telas de truques",
-          confirmText: "Ok",
-          onConfirmPress: () => pickImage()
-        })
-      } else {
-        pickImage()
-      }
-    } catch (error) { }
-  };
-
-  async function pickImage() {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: false,
-        aspect: [4, 3],
-        quality: 1,
-      })
-      await StorageService.storeData("background_image", result.assets[0].uri);
-      DeviceEventEmitter.emit("background_image", {})
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function removeBackground() {
-    await StorageService.removeItem("background_image");
-    DeviceEventEmitter.emit("background_image", {});
-    ToastAndroid.show('Imagem removida!', ToastAndroid.SHORT);
+    const id = await StorageService.getData("push_token");
+    setPushToken(id)
   }
 
   const Card = ({ label, children, fill }) => (
@@ -118,13 +75,13 @@ export default function Home({ navigation }) {
           onPress={() => navigation.navigate("CoinSelect")}
         />
       </Card>
-      {!!deviceId &&
+      {!!pushToken &&
         <View style={{ alignSelf: "center", alignItems: "center", marginVertical: 20 }}>
           <Text bold style={styles.label}>Meu Código</Text>
           <View style={{ backgroundColor: "#fff", borderRadius: 5, padding: 10 }}>
             <QRCode
               size={150}
-              value={deviceId}
+              value={pushToken}
             />
           </View>
           <Text center size='footnote' style={{ marginTop: 10, maxWidth: "60%" }}>
