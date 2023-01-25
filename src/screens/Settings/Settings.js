@@ -1,5 +1,5 @@
 import React from "react";
-import { PixelRatio, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { DeviceEventEmitter, PixelRatio, StyleSheet, Text, ToastAndroid, TouchableOpacity, View } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import { AlertService, StorageService } from "../../services";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -40,6 +40,12 @@ export default function Settings({ navigation, route }) {
     }
   }
 
+  async function removeBackground() {
+    await StorageService.removeItem("background_image");
+    DeviceEventEmitter.emit("background_image", {});
+    ToastAndroid.show('Imagem removida!', ToastAndroid.SHORT);
+  }
+
   const Button = ({ label, onPress, hidden = false }) => (
     <TouchableOpacity
       style={[styles.button, hidden && { display: "none" }]}
@@ -67,6 +73,10 @@ export default function Settings({ navigation, route }) {
       <Button
         label={"Imagem de fundo"}
         onPress={check}
+      />
+      <Button
+        label={"Remover imagem de fundo"}
+        onPress={removeBackground}
       />
       <Button
         label={"Configurar truques"}
